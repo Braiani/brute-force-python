@@ -4,7 +4,11 @@ import re
 
 
 def find_username(url, text_failed, filename):
-    users_file = open(filename, 'r')
+    try:
+        users_file = open(filename, 'r')
+    except FileNotFoundError:
+        print("File not Found")
+        return False
 
     users_list = []
 
@@ -37,10 +41,16 @@ def find_username(url, text_failed, filename):
         if text_failed not in str(response_request.content):
             print(f"User Located: {user}")
             return user
+    
+    return False
 
 
 def find_password(url, user, text_failed, filename):
-    password_file = open(filename, 'r')
+    try:
+        password_file = open(filename, 'r')
+    except FileNotFoundError:
+        print("File not Found")
+        return False
 
     password_list = []
 
@@ -73,13 +83,20 @@ def find_password(url, user, text_failed, filename):
         if text_failed not in str(response_request.content):
             print(f"Password Located: {password}")
             return password
+        
+    return False
 
 
 url = 'http://localhost/'
-user_failed_text = "Invalid username"
-pass_failed_text = "Invalid password"
+user_text_failed = "Invalid username"
+password_text_failed = "Invalid password"
 
-user = find_username(url, user_failed_text, 'wordlists/usernames.txt')
-password = find_password(url, user, pass_failed_text, 'wordlists/passwords.txt')
+user = find_username(url, user_text_failed, '../wordlists/usernames.txt')
 
-print(f"User: {user} - Password: {password}")
+if user is not False:
+    password = find_password(url, user, password_text_failed, '../wordlists/passwords.txt')
+
+if user is not False and password is not False:
+    print(f"User: {user} - Password: {password}")
+else:
+    print("User or password not found")
